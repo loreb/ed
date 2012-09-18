@@ -61,6 +61,8 @@ extern "C" {
 #define _NEEDUINT 1
 #define _NEEDULONG 1
 
+typedef jmp_buf sigjmp_buf[1];	/* FIXME */
+
 typedef long p9jmp_buf[sizeof(sigjmp_buf)/sizeof(long)];
 
 #if defined(__linux__)
@@ -121,10 +123,10 @@ typedef long p9jmp_buf[sizeof(sigjmp_buf)/sizeof(long)];
 #	undef _NEEDUSHORT
 #	undef _NEEDUINT
 #	undef _NEEDULONG
+#elif defined(__MINGW32__)
+	/* /bin/ed doesn't need no stinking threads */
 #else
-	/* No idea what system this is -- try some defaults */
-#	include <pthread.h>
-#	define PLAN9PORT_USING_PTHREADS 1
+#	error wtf is this?
 #endif
 
 #ifndef O_DIRECT
