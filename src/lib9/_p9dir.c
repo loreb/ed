@@ -4,8 +4,43 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+/*
 #include <pwd.h>
 #include <grp.h>
+ */
+/* ed calls dirfstat, but it doesn't check user/group;
+   sys/stat.h in mingw uses shorts. */
+struct passwd {
+	short pw_uid;
+	char *pw_name;
+};
+struct group {
+	short gr_gid;
+	char *gr_name;
+};
+
+static struct group *getgrgid(short gid)
+{
+	static struct group g;	/* dummy */
+	g.gr_gid = gid;
+	g.gr_name = "group";
+	return &g;
+}
+
+static struct passwd *getpwuid(short uid)
+{
+	static struct passwd p;	/* dummy */
+	p.pw_uid = uid;
+	p.pw_name = "user";
+	return &p;
+}
+
+#ifndef S_ISLNK
+#	define S_ISLNK(mode) 	((void)(mode), 0)
+#endif
+#ifndef S_ISSOCK
+#	define S_ISSOCK(mode)	((void)(mode), 0)
+#endif
 
 #if defined(__APPLE__)
 #define _HAVESTGEN
