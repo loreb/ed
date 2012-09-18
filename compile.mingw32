@@ -1,0 +1,3 @@
+#! /bin/sh
+exec mingw32-gcc -Wall -Wextra -g -O2 "$@"
+# FreeBSD
