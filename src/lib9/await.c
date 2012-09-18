@@ -1,12 +1,15 @@
+/*
+ * This file is only here to convert string<-->signal;
+ * the wait*() functions  are unused -- the original ed
+ * forks and waits immediately, I'll just spawn()
+ */
 #define NOPLAN9DEFINES
 #include <u.h>
 #include <libc.h>
 
 #include <signal.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <sys/time.h>
-#include <sys/resource.h>
 
 #ifndef WCOREDUMP	/* not on Mac OS X Tiger */
 #define WCOREDUMP(status) 0
@@ -16,44 +19,96 @@ static struct {
 	int sig;
 	char *str;
 } tab[] = {
+#ifdef SIGHUP
 	SIGHUP,		"hangup",
+#endif
+#ifdef SIGINT
 	SIGINT,		"interrupt",
+#endif
+#ifdef SIGQUIT
 	SIGQUIT,		"quit",
+#endif
+#ifdef SIGILL
 	SIGILL,		"sys: illegal instruction",
+#endif
+#ifdef SIGTRAP
 	SIGTRAP,		"sys: breakpoint",
+#endif
+#ifdef SIGABRT
 	SIGABRT,		"sys: abort",
+#endif
 #ifdef SIGEMT
 	SIGEMT,		"sys: emulate instruction executed",
 #endif
+#ifdef SIGFPE
 	SIGFPE,		"sys: fp: trap",
+#endif
+#ifdef SIGKILL
 	SIGKILL,		"sys: kill",
+#endif
+#ifdef SIGBUS
 	SIGBUS,		"sys: bus error",
+#endif
+#ifdef SIGSEGV
 	SIGSEGV,		"sys: segmentation violation",
+#endif
+#ifdef SIGALRM
 	SIGALRM,		"alarm",
+#endif
+#ifdef SIGTERM
 	SIGTERM,		"kill",
+#endif
+#ifdef SIGURG
 	SIGURG,		"sys: urgent condition on socket",
+#endif
+#ifdef SIGSTOP
 	SIGSTOP,		"sys: stop",
+#endif
+#ifdef SIGTSTP
 	SIGTSTP,		"sys: tstp",
+#endif
+#ifdef SIGCONT
 	SIGCONT,		"sys: cont",
+#endif
+#ifdef SIGCHLD
 	SIGCHLD,		"sys: child",
+#endif
+#ifdef SIGTTIN
 	SIGTTIN,		"sys: ttin",
+#endif
+#ifdef SIGTTOU
 	SIGTTOU,		"sys: ttou",
+#endif
 #ifdef SIGIO	/* not on Mac OS X Tiger */
 	SIGIO,		"sys: i/o possible on fd",
 #endif
+#ifdef SIGXCPU
 	SIGXCPU,		"sys: cpu time limit exceeded",
+#endif
+#ifdef SIGXFSZ
 	SIGXFSZ,		"sys: file size limit exceeded",
+#endif
+#ifdef SIGVTALRM
 	SIGVTALRM,	"sys: virtual time alarm",
+#endif
+#ifdef SIGPROF
 	SIGPROF,		"sys: profiling timer alarm",
+#endif
 #ifdef SIGWINCH	/* not on Mac OS X Tiger */
 	SIGWINCH,	"sys: window size change",
 #endif
 #ifdef SIGINFO
 	SIGINFO,		"sys: status request",
 #endif
+#ifdef SIGUSR1
 	SIGUSR1,		"sys: usr1",
+#endif
+#ifdef SIGUSR2
 	SIGUSR2,		"sys: usr2",
+#endif
+#ifdef SIGPIPE
 	SIGPIPE,		"sys: write on closed pipe",
+#endif
 };
 	
 char*
@@ -84,6 +139,7 @@ _p9strsig(char *s)
 static int
 _await(int pid4, char *str, int n, int opt)
 {
+#ifdef WTERMSIG
 	int pid, status, cd;
 	struct rusage ru;
 	char buf[128], tmp[64];
@@ -115,6 +171,10 @@ _await(int pid4, char *str, int n, int opt)
 			return strlen(str);
 		}
 	}
+#else
+	sysfatal("where on earth does ed call _await()?");
+	return -1;
+#endif
 }
 
 int
@@ -126,7 +186,11 @@ await(char *str, int n)
 int
 awaitnohang(char *str, int n)
 {
+#ifdef WNOHANG
 	return _await(-1, str, n, WNOHANG);
+#else
+	return -1;
+#endif
 }
 
 int
