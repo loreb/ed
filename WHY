@@ -1,0 +1,20 @@
+Ed is the standard text editor.
+
+Cygwin has /bin/ed, but it requires the cygwin dll.
+There's another ed for windows at http://gnuwin32.sourceforge.net/packages/ed.htm,
+but it requires a regex dll.
+
+Ok, only joking.
+
+I'm about to try github (bitbucket? gitorious?) and I was looking for a test project.
+Plus I'm a linux/bsd guy, so porting to mingw makes it not completely boring.
+
+Re the choice of which ed:
+- The GNU page says it's superseded by GNU emacs and GNU moe.
+- The BSD... wait, which BSD?
+- Plan9port is utf8 capable, actively maintained, and I'm already
+  keeping it up to date on all my computers.
+
+The only significant difference wrt all other implementations is
+the way regular expressions work: p9p uses plan9's regexp(7),
+which is "the form used by egrep(1) before egrep got complicated".

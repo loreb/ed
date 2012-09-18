@@ -1,0 +1,6 @@
+#! /bin/sh
+for i in src/lib* ; do
+	test -d "$i" || continue
+	test xlib = x"$i" && continue
+	./mklib "${i#src/}" || exit
+done

@@ -1,0 +1,9 @@
+#! /bin/sh
+set -e
+for f in include/regexp9.h src/cmd/ed.c ; do
+	test -e "$f" || { echo >&2 "wrong dir($f)"; exit 100; }
+done
+test -x compile || cp compile.default compile
+./libs
+./c2o ./compile src/cmd/ed.c -Iinclude
+./compile -o ed src/cmd/ed.o src/lib*/*.a src/lib*/*.a

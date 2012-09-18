@@ -1,0 +1,24 @@
+#! /bin/sh
+test -e "$PLAN9/src/cmd/ed.c" || {
+echo>&2 '$PLAN9?'
+exit 100
+}
+rv=0
+ck() {
+	case x"$1" in
+		(*.p9p)
+			# local copy -- eg original license
+			ck "${1%.p9p}"
+			return
+			;;
+	esac
+	test -e "$PLAN9/$1" || return 0
+	test "$PLAN9/$1" -nt "$1" || return 0
+	echo "$0: $1"
+	rv=1
+}
+
+for i in * */* */*/* */*/*/* ; do
+	ck "$i"
+done
+exit $rv

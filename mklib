@@ -1,0 +1,33 @@
+#! /bin/sh
+ROOT="$PWD"
+cd src || exit
+test 1 -eq $# || { echo >&2 "Usage: $0 lib"; exit 100; }
+case x"$1" in
+	(*/*|*.*)
+		echo >&2 "Usage: $0 lib9	# or any other library"
+		exit 100
+		;;
+esac
+cd "$1" || exit
+
+outdated() {
+	obj="${1%.c}.o"
+	test -s "$obj" || return 0
+	for t in "$obj" *.h */*.h ; do
+		test -e "$t" || continue
+		test  "$t" -nt "$1" && return 0
+		# important: depend on CFLAGS!
+		test "$ROOT"/compile -nt "$t" && return 0
+	done
+	return 1	# false
+}
+
+for f in *.c */*.c ; do
+	test -e "$f" || continue
+	"$ROOT"/c2o "$ROOT"/compile "$f" -I"$ROOT"/include || exit
+done
+/bin/rm -f "$1.a"
+for f in */*.o ; do
+	test -e "$f" && exec ar cru "$1.a" *.o */*.o
+done
+exec ar cru "$1.a" *.o	# no subdirectories

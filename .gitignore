@@ -1,0 +1,19 @@
+# build
+*.o
+*.a
+ed
+
+# backup etc
+\#*#
+*.swp
+*~
+
+# generated
+*.gz
+compile
+
+# tags
+tags
+TAGS
+
+

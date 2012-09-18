@@ -1,0 +1,7 @@
+This is /bin/ed from p9p to msys/mingw(*).
+Yeah, there's no ed in mingw!
+
+Note that this is a port, *not* a portable version:
+this will just not compile on your *nix -- you have the real ed, use it!
+
+(*) Do temporary files go in /var?
