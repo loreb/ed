@@ -14,7 +14,6 @@ int
 p9create(char *path, int mode, ulong perm)
 {
 	int fd, cexec, umode, rclose, lock, rdwr;
-	struct flock fl;
 
 	rdwr = mode&3;
 	lock = mode&OLOCK;
@@ -29,11 +28,12 @@ p9create(char *path, int mode, ulong perm)
 			werrstr("bad mode in directory create");
 			goto out;
 		}
-		if(mkdir(path, perm&0777) < 0)
+		/* win32: perms need CreateDirectory */
+		if(mkdir(path/*, perm&0777*/) < 0)
 			goto out;
 		fd = open(path, O_RDONLY);
 	}else{
-		umode = (mode&3)|O_CREAT|O_TRUNC;
+		umode = (mode&3)|O_CREAT|O_TRUNC | O_BINARY;
 		mode &= ~(3|OTRUNC);
 		if(mode&ODIRECT){
 			umode |= O_DIRECT;
@@ -56,18 +56,13 @@ p9create(char *path, int mode, ulong perm)
 out:
 	if(fd >= 0){
 		if(lock){
-			fl.l_type = (rdwr==OREAD) ? F_RDLCK : F_WRLCK;
-			fl.l_whence = SEEK_SET;
-			fl.l_start = 0;
-			fl.l_len = 0;
-			if(fcntl(fd, F_SETLK, &fl) < 0){
-				close(fd);
-				werrstr("lock: %r");
-				return -1;
-			}
+			/* unused by ed; in windows this requires messing with file handles */
+			sysfatal("create(%s, OLOCK)", path);
 		}
-		if(cexec)
-			fcntl(fd, F_SETFL, FD_CLOEXEC);
+		if(cexec) {
+			/* unused by ed -- no idea how to do it! */
+			sysfatal("p9create: fcntl(fd, F_SETFL, FD_CLOEXEC);");
+		}
 		if(rclose)
 			remove(path);
 	}
