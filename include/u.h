@@ -61,9 +61,14 @@ extern "C" {
 #define _NEEDUINT 1
 #define _NEEDULONG 1
 
-typedef jmp_buf sigjmp_buf[1];	/* FIXME */
+typedef struct {
+	jmp_buf buf;	/* FIXME */
+	long savemask;
+} sigjmp_buf[1];
 
 typedef long p9jmp_buf[sizeof(sigjmp_buf)/sizeof(long)];
+extern int sigsetjmp(sigjmp_buf, int);
+extern void siglongjmp(sigjmp_buf, int);
 
 #if defined(__linux__)
 #	include <sys/types.h>

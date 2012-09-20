@@ -1,0 +1,3 @@
+- try it on windows, not wine!
+- ed.c: mktemp("/var/tmp/eXXXXX")
+- sigsetjmp/siglongjmp: reimplement procmask?
