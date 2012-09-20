@@ -175,6 +175,12 @@ signotify(int sig)
 		_exit(1);
 	case 2:	/* noted(NCONT) */
 		if(0)print("HANDLED %d\n", sig);
+		/*
+		 * Windows does "signal(sig, SIG_DFL)" before invoking
+		 * the signal handler, like SysV.
+		 * MSDN says it's a "feature".
+		 */
+		signal(sig, signotify);
 		return;
 	}
 }
