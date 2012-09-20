@@ -12,7 +12,6 @@ p9open(char *name, int mode)
 {
 	int cexec, rclose;
 	int fd, umode, lock, rdwr;
-	struct flock fl;
 
 	rdwr = mode&3;
 	umode = rdwr;
@@ -29,7 +28,8 @@ p9open(char *name, int mode)
 		mode ^= ODIRECT;
 	}
 	if(mode&ONONBLOCK){
-		umode |= O_NONBLOCK;
+		/* windows doesn't have/need it */
+		sysfatal("umode |= O_NONBLOCK");
 		mode ^= ONONBLOCK;
 	}
 	if(mode&OAPPEND){
@@ -42,19 +42,11 @@ p9open(char *name, int mode)
 	}
 	fd = open(name, umode);
 	if(fd >= 0){
-		if(lock){
-			fl.l_type = (rdwr==OREAD) ? F_RDLCK : F_WRLCK;
-			fl.l_whence = SEEK_SET;
-			fl.l_start = 0;
-			fl.l_len = 0;
-			if(fcntl(fd, F_SETLK, &fl) < 0){
-				close(fd);
-				werrstr("lock: %r");
-				return -1;
-			}
-		}
+		/* see create.c */
+		if(lock)
+			sysfatal("open(OLOCK)");
 		if(cexec)
-			fcntl(fd, F_SETFL, FD_CLOEXEC);
+			sysfatal("open(OCEXEC)");
 		if(rclose)
 			remove(name);
 	}
