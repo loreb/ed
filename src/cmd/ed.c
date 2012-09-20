@@ -918,7 +918,8 @@ browse(void)
 void
 callunix(void)
 {
-	int c, pid;
+	intptr_t x;
+	int c;
 	Rune rune;
 	char buf[512];
 	char *p;
@@ -931,16 +932,12 @@ callunix(void)
 			p += runetochar(p, &rune);
 		}
 	*p = 0;
-	pid = fork();
-	if(pid == 0) {
-		execlp("rc", "rc", "-c", buf, (char*)0);
-		sysfatal("exec failed: %r");
-		exits("execl failed");
-	}
-	waiting = 1;
-	while(waitpid() != pid)
-		;
-	waiting = 0;
+	/* win32: spawn(_P_WAIT) returns the exit code */
+	/* p9p uses rc... */
+	x = spawnlp(_P_WAIT, "cmd.exe", "cmd.exe", "/C", buf, (char*)0);
+	if(x == -1)
+		/* ok fprint */
+		fprint(2, "%s: spawnlp failed: %r\n", argv0);
 	if(vflag)
 		putst("!");
 }
