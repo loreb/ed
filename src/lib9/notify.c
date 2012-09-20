@@ -213,10 +213,12 @@ typedef void Sighandler(int);
 static Sighandler*
 handler(int s)
 {
-	struct sigaction sa;
+	Sighandler *curr;
 
-	sigaction(s, nil, &sa);
-	return sa.sa_handler;
+	curr = signal(s, SIG_DFL);
+	if(SIG_ERR == signal(s, curr))
+		sysfatal("handler: %r");
+	return curr;
 }
 
 static int
@@ -253,28 +255,29 @@ notedisable(char *msg)
 static int
 notifyseton(int s, int on)
 {
+	Sighandler *sigh, *oldh;
 	Sig *sig;
-	struct sigaction sa, osa;
 
 	sig = findsig(s);
 	if(sig == nil)
 		return -1;
-	memset(&sa, 0, sizeof sa);
-	sa.sa_handler = on ? signotify : signonotify;
+	sigh = on ? signotify : signonotify;
 	if(sig->flags&Restart)
-		sa.sa_flags |= SA_RESTART;
+		/* none on win32: this is an assertion */
+		sysfatal("sa.sa_flags |= SA_RESTART");
 
 	/*
 	 * We can't allow signals within signals because there's
 	 * only one jump buffer.
 	 */
-	sigfillset(&sa.sa_mask);
+	/* sigfillset(&sa.sa_mask); */
+	/* FIXME equivalent in windows? */
 
 	/*
 	 * Install handler.
 	 */
-	sigaction(sig->sig, &sa, &osa);
-	return osa.sa_handler == signotify;
+	oldh = signal(sig->sig, sigh);
+	return oldh == signotify;
 }
 
 int
