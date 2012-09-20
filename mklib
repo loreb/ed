@@ -30,6 +30,6 @@ for f in *.c */*.c ; do
 done
 /bin/rm -f "$1.a"
 for f in */*.o ; do
-	test -e "$f" && exec ar cru "$1.a" *.o */*.o
+	test -e "$f" && exec "$ROOT"/ar cru "$1.a" *.o */*.o
 done
-exec ar cru "$1.a" *.o	# no subdirectories
+exec "$ROOT"/ar cru "$1.a" *.o	# no subdirectories

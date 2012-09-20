@@ -1,0 +1,3 @@
+#! /bin/sh
+exec mingw32-ar "$@"
+# FreeBSD
