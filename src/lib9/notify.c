@@ -41,32 +41,69 @@ enum
 	NoNotify = 1<<2,
 };
 
+/*
+ * Windows signals:
+ * SIGABRT
+ * SIGFPE
+ * SIGILL
+ * SIGINT
+ * SIGSEGV
+ * SIGTERM
+ */
 static Sig sigs[] = {
+#ifdef SIGHUP
 	SIGHUP,		0,
+#endif
 	SIGINT,		0,
+#ifdef SIGQUIT
 	SIGQUIT,		0,
+#endif
 	SIGILL,		0,
+#ifdef SIGTRAP
 	SIGTRAP,		0,
+#endif
 /*	SIGABRT, 		0, 	*/
 #ifdef SIGEMT
 	SIGEMT,		0,
 #endif
 	SIGFPE,		0,
+#ifdef SIGBUS
 	SIGBUS,		0,
+#endif
 /*	SIGSEGV, 		0, 	*/
+#ifdef SIGCHLD
 	SIGCHLD,		Restart|Ignore,
+#endif
+#ifdef SIGSYS
 	SIGSYS,		0,
+#endif
+#ifdef SIGPIPE
 	SIGPIPE,		Ignore,
+#endif
+#ifdef SIGALRM
 	SIGALRM,		0,
+#endif
 	SIGTERM,		0,
+#ifdef SIGTSTP
 	SIGTSTP,		Restart|Ignore|NoNotify,
+#endif
 /*	SIGTTIN,		Restart|Ignore, */
 /*	SIGTTOU,		Restart|Ignore, */
+#ifdef SIGXCPU
 	SIGXCPU,		0,
+#endif
+#ifdef SIGXFSZ
 	SIGXFSZ,		0,
+#endif
+#ifdef SIGVTALRM
 	SIGVTALRM,	0,
+#endif
+#ifdef SIGUSR1
 	SIGUSR1,		0,
+#endif
+#ifdef SIGUSR2
 	SIGUSR2,		0,
+#endif
 #ifdef SIGWINCH
 	SIGWINCH,	Restart|Ignore|NoNotify,
 #endif
@@ -185,6 +222,7 @@ handler(int s)
 static int
 notesetenable(int sig, int enabled)
 {
+#ifdef SIG_BLOCK
 	sigset_t mask, omask;
 
 	if(sig == 0)
@@ -193,7 +231,11 @@ notesetenable(int sig, int enabled)
 	sigemptyset(&mask);
 	sigaddset(&mask, sig);
 	sigprocmask(enabled ? SIG_UNBLOCK : SIG_BLOCK, &mask, &omask);
-	return !sigismember(&omask, sig);	
+	return !sigismember(&omask, sig);
+#else
+	sysfatal("notesetenable unimplemented!");
+	return -1;
+#endif	
 }
 
 int
