@@ -15,6 +15,7 @@ extern "C" {
 
 #include <utf.h>
 #include <fmt.h>
+#include <windef.h>	/* MAX_PATH */
 
 /*
  * Begin usual libc.h 
@@ -397,6 +398,7 @@ extern	int	iounit(int);
 extern	void	p9longjmp(p9jmp_buf, int);
 extern	char*	mktemp(char*);
 extern	int		opentemp(char*, int);
+extern	int	mktempfd(char path[MAX_PATH], int, int);
 /* extern	double	modf(double, double*); <math.h> */
 extern	void	p9notejmp(void*, p9jmp_buf, int);
 extern	void	perror(const char*);

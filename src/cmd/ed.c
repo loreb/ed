@@ -125,7 +125,7 @@ void	substitute(int);
 Rune La[] = { 'a', 0 };
 Rune Lr[] = { 'r', 0 };
 
-char tmp[] = "/var/tmp/eXXXXX";
+char tmp[MAX_PATH];
 
 void
 main(int argc, char *argv[])
@@ -161,7 +161,6 @@ main(int argc, char *argv[])
 		globp = Lr;
 	}
 	zero = malloc((nlall+5)*sizeof(int*));
-	tfname = mktemp(tmp);
 	init();
 	setjmp(savej);
 	commands();
@@ -1114,10 +1113,11 @@ init(void)
 	iblock = -1;
 	oblock = -1;
 	ichanged = 0;
-	if((tfile = create(tfname, ORDWR, 0600)) < 0){
+	if((tfile = mktempfd(tmp, ORDWR, 0600)) < 0){fprint(2, "creat: %r");
 		error1(T);
 		exits(0);
 	}
+	tfname = tmp;fprint(2, "tfname %s!", tfname);
 	dot = dol = zero;
 }
 
@@ -1577,32 +1577,6 @@ putchr(int ac)
 		return;
 	}
 	linp = lp;
-}
-
-char*
-mktemp(char *as)
-{
-	char *s;
-	unsigned pid;
-	int i;
-
-	pid = getpid();
-	s = as;
-	while(*s++)
-		;
-	s--;
-	while(*--s == 'X') {
-		*s = pid % 10 + '0';
-		pid /= 10;
-	}
-	s++;
-	i = 'a';
-	while(access(as, 0) != -1) {
-		if(i == 'z')
-			return "/";
-		*s = i++;
-	}
-	return as;
 }
 
 void
