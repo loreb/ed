@@ -1113,11 +1113,12 @@ init(void)
 	iblock = -1;
 	oblock = -1;
 	ichanged = 0;
-	if((tfile = mktempfd(tmp, ORDWR, 0600)) < 0){fprint(2, "creat: %r");
+	if((tfile = mktempfd(tmp, ORDWR, 0600)) < 0){
+		if(1) fprint(2, "creat: %r");	/* TODO remove */
 		error1(T);
 		exits(0);
 	}
-	tfname = tmp;fprint(2, "tfname %s!", tfname);
+	tfname = tmp;
 	dot = dol = zero;
 }
 

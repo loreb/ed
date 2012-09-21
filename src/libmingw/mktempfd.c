@@ -37,13 +37,14 @@ int mktempfd(char filename[MAX_PATH], int mode, int perm)
 		/* Generates a temporary file name. */
 		dw = GetTempFileName(temp_path, /* directory for tmp files */
 		"edXXXXXXXXXX",        /* temp file name prefix */
-		1,                    /* let ME create it! */
+		0,                    /* create empty, open, close */
 		temp_file);          /* buffer for name */
 		if(dw == 0) {
 			werrstr("GetTempFileName: error %lu",
 			    (unsigned long)GetLastError());
 			continue;
 		}
+		remove(temp_file);	/* GetTempFileName created it already... */
 		fd = create(temp_file, OEXCL | mode, perm);
 		if(fd >= 0) {
 			strcpy(filename, temp_file);
