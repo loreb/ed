@@ -64,11 +64,20 @@ extern "C" {
 typedef struct {
 	jmp_buf buf;	/* FIXME */
 	long savemask;
-} sigjmp_buf[1];
+} sigjmp_buf[1], p9jmp_buf[1];
 
-typedef long p9jmp_buf[sizeof(sigjmp_buf)/sizeof(long)];
-extern int sigsetjmp(sigjmp_buf, int);
-extern void siglongjmp(sigjmp_buf, int);
+/*typedef long p9jmp_buf[sizeof(sigjmp_buf)/sizeof(long)];*/
+extern void _sigjmp_savemask(sigjmp_buf, int);
+extern void _sigjmp_restoremask(sigjmp_buf);
+/* need to call the underlying setjmp, period. */
+#define _os_setjmp(env) setjmp(env)
+#define _os_longjmp(env, val) longjmp((env), (val))
+#define sigsetjmp(env, savemask) \
+	(_sigjmp_savemask(env, savemask), _setjmp((env)->buf))
+#define siglongjmp(env, val) \
+	(_sigjmp_restoremask(env), _os_longjmp((env)->buf, val))
+/* extern int sigsetjmp(sigjmp_buf, int); */
+/*extern void siglongjmp(sigjmp_buf, int); */
 
 #if defined(__linux__)
 #	include <sys/types.h>

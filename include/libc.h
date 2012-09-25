@@ -408,7 +408,7 @@ extern	double	p9pow10(int);
 /* extern	void	qsort(void*, long, long, int (*)(void*, void*)); <stdlib.h> */
 extern	char*	searchpath(char*);
 /* extern	int	p9setjmp(p9jmp_buf); */
-#define p9setjmp(b)	sigsetjmp((void*)(b), 1)
+#define p9setjmp(b)	sigsetjmp((b), 1)
 /*
  * <stdlib.h>
 extern	long	strtol(char*, char**, int);
