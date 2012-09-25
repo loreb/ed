@@ -70,6 +70,7 @@ typedef struct {
 extern void _sigjmp_savemask(sigjmp_buf, int);
 extern void _sigjmp_restoremask(sigjmp_buf);
 /* need to call the underlying setjmp, period. */
+/* see commit 249e5b114fa52867f9bf8d9769423eb837b78b63 */
 #define _os_setjmp(env) setjmp(env)
 #define _os_longjmp(env, val) longjmp((env), (val))
 #define sigsetjmp(env, savemask) \
